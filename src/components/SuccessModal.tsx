@@ -120,9 +120,7 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           </div>
 
           {/* Ad inside success modal */}
-          <div className="mt-5">
-            <AdSlot slotId={SITE_CONFIG.adSlots.SUCCESS} minHeight="min-h-[75px]" />
-          </div>
+          <AdSlot slotId={SITE_CONFIG.adSlots.SUCCESS} />
 
           {/* Actions */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">

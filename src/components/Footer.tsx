@@ -23,9 +23,7 @@ export const Footer: React.FC<FooterProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* Ad Footer Placement */}
-        <div>
-          <AdSlot slotId={SITE_CONFIG.adSlots.FOOTER} minHeight="min-h-[80px]" className="bg-slate-800/80 border-slate-700 text-slate-300" />
-        </div>
+        <AdSlot slotId={SITE_CONFIG.adSlots.FOOTER} />
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-slate-800">
           

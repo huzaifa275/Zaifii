@@ -3,25 +3,35 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Flame, Info, Activity } from 'lucide-react';
 import { ActivityFeedItem } from '../types';
 
-// Predefined activity samples for live notification stream
+// Masking function: Shows only the first letter and masks all remaining characters with '*'
+const maskPlayerName = (rawName: string): string => {
+  if (!rawName) return 'P********';
+  const firstLetter = rawName.trim().charAt(0).toUpperCase();
+  // Strip existing asterisks if any to find approximate original name length
+  const unmaskedBase = rawName.replace(/\*+/g, '');
+  const totalLen = Math.max(8, unmaskedBase.length + 5);
+  return `${firstLetter}${'*'.repeat(totalLen - 1)}`;
+};
+
+// Predefined activity samples with masked player names and UIDs
 const FEED_SAMPLES = [
-  { name: 'Shadow***99', uid: '109****21', pkg: '520 💎' },
-  { name: 'King_***FF', uid: '882****04', pkg: '1,060 💎' },
-  { name: 'Pro_***07', uid: '341****19', pkg: '310 💎' },
-  { name: 'Viper***X', uid: '901****82', pkg: '2,180 💎' },
-  { name: 'Zaif***Pro', uid: '561****90', pkg: '100 💎' },
-  { name: 'Alpha***01', uid: '772****33', pkg: '520 💎' },
-  { name: 'Ghost***88', uid: '409****12', pkg: '310 💎' },
+  { name: 'S*********', uid: '109****21', pkg: '520 💎' },
+  { name: 'K*********', uid: '882****04', pkg: '1,060 💎' },
+  { name: 'P********', uid: '341****19', pkg: '310 💎' },
+  { name: 'V*******', uid: '901****82', pkg: '2,180 💎' },
+  { name: 'Z********', uid: '561****90', pkg: '100 💎' },
+  { name: 'A********', uid: '772****33', pkg: '520 💎' },
+  { name: 'G********', uid: '409****12', pkg: '310 💎' },
 ];
 
 export const ActivitySection: React.FC = () => {
   const [sampleIndex, setSampleIndex] = useState(0);
 
   const [recentLog, setRecentLog] = useState<ActivityFeedItem[]>([
-    { id: 'act-1', playerName: 'Shadow***99', uidMasked: '109****21', diamonds: '520 💎', timeAgo: 'Just now' },
-    { id: 'act-2', playerName: 'King_***FF', uidMasked: '882****04', diamonds: '1,060 💎', timeAgo: '24s ago' },
-    { id: 'act-3', playerName: 'Pro_***07', uidMasked: '341****19', diamonds: '310 💎', timeAgo: '41s ago' },
-    { id: 'act-4', playerName: 'Viper***X', uidMasked: '901****82', diamonds: '2,180 💎', timeAgo: '1m ago' },
+    { id: 'act-1', playerName: 'S*********', uidMasked: '109****21', diamonds: '520 💎', timeAgo: 'Just now' },
+    { id: 'act-2', playerName: 'K*********', uidMasked: '882****04', diamonds: '1,060 💎', timeAgo: '24s ago' },
+    { id: 'act-3', playerName: 'P********', uidMasked: '341****19', diamonds: '310 💎', timeAgo: '41s ago' },
+    { id: 'act-4', playerName: 'V*******', uidMasked: '901****82', diamonds: '2,180 💎', timeAgo: '1m ago' },
   ]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -109,7 +119,7 @@ export const ActivitySection: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-heading font-bold text-slate-900 text-sm flex items-center gap-2">
-                        <span>{act.playerName}</span>
+                        <span>{maskPlayerName(act.playerName)}</span>
                         <span className="text-[11px] font-mono text-slate-400 bg-slate-200/60 px-1.5 py-0.5 rounded">
                           UID: {act.uidMasked}
                         </span>

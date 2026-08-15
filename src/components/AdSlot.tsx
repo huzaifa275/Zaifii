@@ -1,43 +1,93 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { SITE_CONFIG } from '../config/siteConfig';
 
 interface AdSlotProps {
   slotId: string;
   className?: string;
-  minHeight?: string;
+  adCode?: string;
 }
 
 export const AdSlot: React.FC<AdSlotProps> = ({
   slotId,
   className = '',
-  minHeight = 'min-h-[90px]',
+  adCode,
 }) => {
-  // ========================================
-  // ZAIFII AD SLOT
-  // NETWORK: ADSTERRA / MONETAG
-  // INSERT APPROVED AD CODE HERE
-  // Slot Identifier: ${slotId}
-  // Example for Adsterra: <script type="text/javascript" src="//atScript.js"></script>
-  // Example for Monetag: <script src="https://alwingulla.com/88/tag.min.js" data-zone="123456" async data-cfasync="false"></script>
-  // ========================================
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hasAdContent, setHasAdContent] = useState<boolean>(false);
+
+  // Get active ad code from prop, siteConfig, or window global object
+  const activeCode =
+    adCode ||
+    SITE_CONFIG.adCodes?.[slotId] ||
+    (typeof window !== 'undefined' && (window as any)?.ZAIFII_ADS?.[slotId]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    if (!activeCode) {
+      setHasAdContent(false);
+      return;
+    }
+
+    if (container.getAttribute('data-loaded-code') === activeCode) {
+      return;
+    }
+
+    // Clean previous scripts or markup
+    container.innerHTML = '';
+
+    try {
+      // Create document fragment to execute embedded scripts (Adsterra, Monetag, etc.)
+      const range = document.createRange();
+      range.selectNode(container);
+      const fragment = range.createContextualFragment(activeCode);
+
+      const scripts = Array.from(fragment.querySelectorAll('script'));
+
+      container.appendChild(fragment);
+
+      // Re-instantiate script elements to guarantee browser execution in dynamic React mounting
+      scripts.forEach((oldScript) => {
+        const newScript = document.createElement('script');
+        Array.from(oldScript.attributes).forEach((attr) => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        newScript.textContent = oldScript.textContent;
+        if (oldScript.parentNode) {
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        } else {
+          container.appendChild(newScript);
+        }
+      });
+
+      container.setAttribute('data-loaded-code', activeCode);
+      setHasAdContent(true);
+    } catch (err) {
+      console.warn(`[AdSlot] Error loading ad snippet for ${slotId}:`, err);
+    }
+  }, [slotId, activeCode]);
+
+  // When no active ad code is provided, do not render blank rectangles or reserved whitespace
+  if (!activeCode && !hasAdContent) {
+    return (
+      <div
+        ref={containerRef}
+        id={`ad-container-${slotId}`}
+        data-ad-slot={slotId}
+        aria-hidden="true"
+        className="hidden"
+      />
+    );
+  }
 
   return (
     <div
+      ref={containerRef}
+      id={`ad-container-${slotId}`}
       data-ad-slot={slotId}
-      className={`relative w-full overflow-hidden rounded-xl bg-slate-50/70 border border-dashed border-slate-200 flex flex-col items-center justify-center p-3 transition-all text-center ${minHeight} ${className}`}
-    >
-      {/* Dev comment placeholder representation */}
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-        <span>Ad Placement ({slotId})</span>
-      </div>
-      <p className="text-[11px] text-slate-400 mt-0.5">
-        Adsterra / Monetag Code Reserved Container
-      </p>
-
-      {/* Reserved area to prevent CLS (Cumulative Layout Shift) */}
-      <div id={`ad-container-${slotId}`} className="w-full flex justify-center">
-        {/* Ad script render anchor */}
-      </div>
-    </div>
+      className={`w-full max-w-full flex justify-center items-center overflow-hidden transition-all ${className}`}
+    />
   );
 };
+

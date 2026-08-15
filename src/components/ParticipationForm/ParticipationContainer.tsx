@@ -142,9 +142,7 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
           </div>
 
           {/* Embedded Ad Slot inside form bottom */}
-          <div className="mt-8 pt-4 border-t border-slate-100">
-            <AdSlot slotId={SITE_CONFIG.adSlots.FORM_BETWEEN} minHeight="min-h-[70px]" />
-          </div>
+          <AdSlot slotId={SITE_CONFIG.adSlots.FORM_BETWEEN} />
 
         </div>
 

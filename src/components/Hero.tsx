@@ -128,9 +128,7 @@ export const Hero: React.FC<HeroProps> = ({
         </motion.div>
 
         {/* Hero Ad Placement */}
-        <div className="mt-8">
-          <AdSlot slotId={SITE_CONFIG.adSlots.HERO} minHeight="min-h-[100px]" />
-        </div>
+        <AdSlot slotId={SITE_CONFIG.adSlots.HERO} />
 
       </div>
     </section>

@@ -99,9 +99,7 @@ export const Step4Review: React.FC<Step4ReviewProps> = ({
       </div>
 
       {/* Ad before submission */}
-      <div className="max-w-md mx-auto">
-        <AdSlot slotId={SITE_CONFIG.adSlots.BEFORE_SUBMIT} minHeight="min-h-[80px]" />
-      </div>
+      <AdSlot slotId={SITE_CONFIG.adSlots.BEFORE_SUBMIT} className="max-w-md mx-auto" />
 
       {/* Actions */}
       <div className="pt-2 max-w-md mx-auto flex items-center gap-3">

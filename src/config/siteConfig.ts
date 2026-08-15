@@ -30,6 +30,17 @@ export const SITE_CONFIG = {
     FOOTER: 'AD_FOOTER',
   },
 
+  // Approved Network Ad Scripts (Adsterra / Monetag / Custom HTML)
+  adCodes: {
+    AD_HEADER: '',
+    AD_HERO: '',
+    AD_FORM_BETWEEN: '',
+    AD_CONTENT: `<script async="async" data-cfasync="false" src="https://staturenonsense.com/0b64ad24fd6c90c2271362a011b94af0/invoke.js"></script><div id="container-0b64ad24fd6c90c2271362a011b94af0"></div>`,
+    AD_BEFORE_SUBMIT: '',
+    AD_SUCCESS: '',
+    AD_FOOTER: '',
+  } as Record<string, string>,
+
   // Diamond Packages
   diamondOptions: [
     { id: 'd100', amount: 100, label: '100 💎', bonusText: 'Starter Entry', isPopular: false },

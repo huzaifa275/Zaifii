@@ -187,9 +187,7 @@ export const Header: React.FC<HeaderProps> = ({
       </AnimatePresence>
 
       {/* Embedded Header Ad Placement */}
-      <div className="max-w-7xl mx-auto px-4 py-2">
-        <AdSlot slotId={SITE_CONFIG.adSlots.HEADER} minHeight="min-h-[50px]" />
-      </div>
+      <AdSlot slotId={SITE_CONFIG.adSlots.HEADER} />
     </header>
   );
 };

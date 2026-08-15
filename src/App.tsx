@@ -145,9 +145,7 @@ export default function App() {
             />
 
             {/* Middle Content Ad Placement */}
-            <div className="max-w-7xl mx-auto px-4 py-2">
-              <AdSlot slotId={SITE_CONFIG.adSlots.CONTENT} minHeight="min-h-[90px]" />
-            </div>
+            <AdSlot slotId={SITE_CONFIG.adSlots.CONTENT} className="max-w-7xl mx-auto px-4" />
 
             {/* Want Another Entry? / TikTok Flow Section */}
             <AdditionalEntrySection
