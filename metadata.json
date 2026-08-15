@@ -1,0 +1,6 @@
+{
+  "name": "ZAIFII",
+  "description": "ZAIFII — Premium Free Fire Giveaway Website",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
