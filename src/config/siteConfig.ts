@@ -28,6 +28,8 @@ export const SITE_CONFIG = {
     BEFORE_SUBMIT: 'AD_BEFORE_SUBMIT',
     SUCCESS: 'AD_SUCCESS',
     FOOTER: 'AD_FOOTER',
+    EXTRA_1: 'AD_EXTRA_1',
+    EXTRA_2: 'AD_EXTRA_2',
   },
 
   // Approved Network Ad Scripts (Adsterra / Monetag / Custom HTML)
@@ -39,6 +41,8 @@ export const SITE_CONFIG = {
     AD_BEFORE_SUBMIT: '',
     AD_SUCCESS: '',
     AD_FOOTER: '',
+    AD_EXTRA_1: `<script src="https://quge5.com/88/tag.min.js" data-zone="270356" async data-cfasync="false"></script>`,
+    AD_EXTRA_2: `<script>(function(s){s.dataset.zone='11575942',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>`,
   } as Record<string, string>,
 
   // Diamond Packages

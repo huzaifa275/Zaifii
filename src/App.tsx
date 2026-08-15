@@ -171,6 +171,12 @@ export default function App() {
 
             {/* FAQ Accordion Section */}
             <FAQSection />
+
+            {/* Extra Ad Slot 1 */}
+            <AdSlot slotId={SITE_CONFIG.adSlots.EXTRA_1} className="max-w-7xl mx-auto px-4" />
+
+            {/* Extra Ad Slot 2 (Vignette / Global format) */}
+            <AdSlot slotId={SITE_CONFIG.adSlots.EXTRA_2} />
           </main>
         );
 
