@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { ParticipationContainer } from './components/ParticipationForm/ParticipationContainer';
@@ -15,12 +15,28 @@ import { ParticipationEntry } from './types';
 import { AdSlot } from './components/AdSlot';
 import { SITE_CONFIG } from './config/siteConfig';
 
+// Dedicated SEO Route Pages
+import { HowItWorksPage } from './components/HowItWorksPage';
+import { GiveawayRulesPage } from './components/GiveawayRulesPage';
+import { FAQPage } from './components/FAQPage';
+import { LearnMorePage } from './components/LearnMorePage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { TermsPage } from './components/TermsPage';
+import { ContactPage } from './components/ContactPage';
+import { NotFoundPage } from './components/NotFoundPage';
+
+// SEO Router Hook
+import { useSeoRouter } from './hooks/useSeoRouter';
+
 export default function App() {
+  const { currentPath, navigate } = useSeoRouter();
+
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [submittedEntry, setSubmittedEntry] = useState<ParticipationEntry | null>(null);
   const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false);
   const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
   const [lastSubmissionTime, setLastSubmissionTime] = useState<number>(0);
+  const [resetKey, setResetKey] = useState<number>(0);
 
   const addToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = `toast-${Date.now()}-${Math.random()}`;
@@ -36,6 +52,19 @@ export default function App() {
   };
 
   const scrollToSection = (sectionId: string) => {
+    if (currentPath !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        if (sectionId === 'hero') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const el = document.getElementById(sectionId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+      return;
+    }
+
     if (sectionId === 'hero') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -46,11 +75,34 @@ export default function App() {
     }
   };
 
-  const scrollToForm = () => {
+  const handleStartNewParticipation = () => {
+    // Increment resetKey to wipe out all form data and return to Step 1
+    setResetKey((prev) => prev + 1);
+    setSubmittedEntry(null);
+    setIsLearnMoreOpen(false);
+    setIsRulesModalOpen(false);
+
+    if (currentPath !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById('participation-form');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          const inputEl = document.getElementById('ff-uid-input') as HTMLInputElement | null;
+          if (inputEl) inputEl.focus();
+        }, 150);
+      }, 100);
+      return;
+    }
+
     const el = document.getElementById('participation-form');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+    setTimeout(() => {
+      const inputEl = document.getElementById('ff-uid-input') as HTMLInputElement | null;
+      if (inputEl) inputEl.focus();
+    }, 150);
   };
 
   const handleSubmitted = (entry: ParticipationEntry) => {
@@ -73,6 +125,83 @@ export default function App() {
     }
   };
 
+  // Render view depending on path
+  const renderMainContent = () => {
+    switch (currentPath) {
+      case '/':
+        return (
+          <main className="flex-1 space-y-4">
+            {/* Hero Section */}
+            <Hero
+              onStartParticipation={handleStartNewParticipation}
+              onLearnHowItWorks={() => scrollToSection('how-it-works')}
+            />
+
+            {/* Main Participation Multi-step Form */}
+            <ParticipationContainer
+              resetKey={resetKey}
+              onSubmitted={handleSubmitted}
+              onError={(msg) => addToast(msg, 'error')}
+            />
+
+            {/* Middle Content Ad Placement */}
+            <div className="max-w-7xl mx-auto px-4 py-2">
+              <AdSlot slotId={SITE_CONFIG.adSlots.CONTENT} minHeight="min-h-[90px]" />
+            </div>
+
+            {/* Want Another Entry? / TikTok Flow Section */}
+            <AdditionalEntrySection
+              onOpenLearnMore={() => navigate('/learn-more')}
+              onStartParticipation={handleStartNewParticipation}
+            />
+
+            {/* How It Works Section */}
+            <HowItWorks
+              onStartParticipation={handleStartNewParticipation}
+              onOpenLearnMore={() => navigate('/learn-more')}
+            />
+
+            {/* Recent Activity Section */}
+            <ActivitySection />
+
+            {/* Giveaway Rules Section */}
+            <GiveawayRules
+              isOpenModal={isRulesModalOpen}
+              onCloseModal={() => setIsRulesModalOpen(false)}
+              onOpenRulesModal={() => setIsRulesModalOpen(true)}
+            />
+
+            {/* FAQ Accordion Section */}
+            <FAQSection />
+          </main>
+        );
+
+      case '/how-it-works':
+        return <HowItWorksPage onNavigate={navigate} onStartParticipation={handleStartNewParticipation} />;
+
+      case '/giveaway-rules':
+        return <GiveawayRulesPage onNavigate={navigate} onStartParticipation={handleStartNewParticipation} />;
+
+      case '/faq':
+        return <FAQPage onNavigate={navigate} />;
+
+      case '/learn-more':
+        return <LearnMorePage onNavigate={navigate} onStartParticipation={handleStartNewParticipation} />;
+
+      case '/privacy-policy':
+        return <PrivacyPolicyPage onNavigate={navigate} />;
+
+      case '/terms':
+        return <TermsPage onNavigate={navigate} />;
+
+      case '/contact':
+        return <ContactPage onNavigate={navigate} onToast={addToast} />;
+
+      default:
+        return <NotFoundPage onNavigate={navigate} />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F7FAFF] text-slate-800 flex flex-col font-sans selection:bg-blue-500 selection:text-white">
       
@@ -82,71 +211,29 @@ export default function App() {
       {/* Header */}
       <Header
         onNavigate={scrollToSection}
-        onOpenLearnMore={() => setIsLearnMoreOpen(true)}
-        onOpenRules={() => setIsRulesModalOpen(true)}
-        onStartParticipation={scrollToForm}
+        onNavigatePath={navigate}
+        onOpenLearnMore={() => navigate('/learn-more')}
+        onOpenRules={() => navigate('/giveaway-rules')}
+        onStartParticipation={handleStartNewParticipation}
       />
 
-      <main className="flex-1 space-y-4">
-        
-        {/* Hero Section */}
-        <Hero
-          onStartParticipation={scrollToForm}
-          onLearnHowItWorks={() => scrollToSection('how-it-works')}
-        />
-
-        {/* Main Participation Multi-step Form */}
-        <ParticipationContainer
-          onSubmitted={handleSubmitted}
-          onError={(msg) => addToast(msg, 'error')}
-        />
-
-        {/* Middle Content Ad Placement */}
-        <div className="max-w-7xl mx-auto px-4 py-2">
-          <AdSlot slotId={SITE_CONFIG.adSlots.CONTENT} minHeight="min-h-[90px]" />
-        </div>
-
-        {/* Want Another Entry? / TikTok Flow Section */}
-        <AdditionalEntrySection
-          onOpenLearnMore={() => setIsLearnMoreOpen(true)}
-          onStartParticipation={scrollToForm}
-        />
-
-        {/* How It Works Section */}
-        <HowItWorks
-          onStartParticipation={scrollToForm}
-          onOpenLearnMore={() => setIsLearnMoreOpen(true)}
-        />
-
-        {/* Recent Activity Section */}
-        <ActivitySection />
-
-        {/* Giveaway Rules Section */}
-        <GiveawayRules
-          isOpenModal={isRulesModalOpen}
-          onCloseModal={() => setIsRulesModalOpen(false)}
-          onOpenRulesModal={() => setIsRulesModalOpen(true)}
-        />
-
-        {/* FAQ Accordion Section */}
-        <FAQSection />
-
-      </main>
+      {renderMainContent()}
 
       {/* Footer */}
       <Footer
         onNavigate={scrollToSection}
-        onOpenLearnMore={() => setIsLearnMoreOpen(true)}
-        onOpenRules={() => setIsRulesModalOpen(true)}
-        onStartParticipation={scrollToForm}
+        onNavigatePath={navigate}
+        onOpenLearnMore={() => navigate('/learn-more')}
+        onOpenRules={() => navigate('/giveaway-rules')}
+        onStartParticipation={handleStartNewParticipation}
       />
 
       {/* Success Modal */}
       <SuccessModal
         entry={submittedEntry}
         onClose={() => setSubmittedEntry(null)}
-        onNewEntry={scrollToForm}
-        onOpenLearnMore={() => setIsLearnMoreOpen(true)}
+        onNewEntry={handleStartNewParticipation}
+        onOpenLearnMore={() => navigate('/learn-more')}
         onToast={addToast}
       />
 
@@ -154,7 +241,7 @@ export default function App() {
       <LearnMoreModal
         isOpen={isLearnMoreOpen}
         onClose={() => setIsLearnMoreOpen(false)}
-        onStartParticipation={scrollToForm}
+        onStartParticipation={handleStartNewParticipation}
       />
 
     </div>

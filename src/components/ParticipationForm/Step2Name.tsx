@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Gamepad2, ArrowRight, ArrowLeft } from 'lucide-react';
 
@@ -17,6 +17,18 @@ export const Step2Name: React.FC<Step2NameProps> = ({
 }) => {
   const [playerName, setPlayerName] = useState(initialName);
   const [inputError, setInputError] = useState('');
+
+  useEffect(() => {
+    setPlayerName(initialName);
+    setInputError('');
+    const timer = setTimeout(() => {
+      const el = document.getElementById('ff-name-input');
+      if (el) {
+        el.focus();
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [initialName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

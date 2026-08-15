@@ -1,48 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Flame, Users, Gem, Trophy, Info, Sparkles } from 'lucide-react';
+import { Flame, Info, Activity } from 'lucide-react';
 import { ActivityFeedItem } from '../types';
 
-export const ActivitySection: React.FC = () => {
-  // Sample activity counter targets
-  const [totalEntries, setTotalEntries] = useState(2582);
-  const [uniquePlayers, setUniquePlayers] = useState(1947);
-  const [diamondRequests, setDiamondRequests] = useState(3126);
+// Predefined activity samples for live notification stream
+const FEED_SAMPLES = [
+  { name: 'Shadow***99', uid: '109****21', pkg: '520 💎' },
+  { name: 'King_***FF', uid: '882****04', pkg: '1,060 💎' },
+  { name: 'Pro_***07', uid: '341****19', pkg: '310 💎' },
+  { name: 'Viper***X', uid: '901****82', pkg: '2,180 💎' },
+  { name: 'Zaif***Pro', uid: '561****90', pkg: '100 💎' },
+  { name: 'Alpha***01', uid: '772****33', pkg: '520 💎' },
+  { name: 'Ghost***88', uid: '409****12', pkg: '310 💎' },
+];
 
-  // Sample live submissions ticker
+export const ActivitySection: React.FC = () => {
+  const [sampleIndex, setSampleIndex] = useState(0);
+
   const [recentLog, setRecentLog] = useState<ActivityFeedItem[]>([
-    { id: 'act-1', playerName: 'Shadow***99', uidMasked: '109****21', diamonds: '520 💎', timeAgo: '8s ago' },
+    { id: 'act-1', playerName: 'Shadow***99', uidMasked: '109****21', diamonds: '520 💎', timeAgo: 'Just now' },
     { id: 'act-2', playerName: 'King_***FF', uidMasked: '882****04', diamonds: '1,060 💎', timeAgo: '24s ago' },
     { id: 'act-3', playerName: 'Pro_***07', uidMasked: '341****19', diamonds: '310 💎', timeAgo: '41s ago' },
     { id: 'act-4', playerName: 'Viper***X', uidMasked: '901****82', diamonds: '2,180 💎', timeAgo: '1m ago' },
-    { id: 'act-5', playerName: 'Zaif***Pro', uidMasked: '561****90', diamonds: '520 💎', timeAgo: '2m ago' },
   ]);
 
-  // Subtle ticker increment every 12s to demonstrate live interface without fake claims
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTotalEntries((prev) => prev + 1);
-      setDiamondRequests((prev) => prev + (Math.random() > 0.5 ? 520 : 310));
-      
-      const newNames = ['Legend***01', 'Ghost***88', 'Alpha***X', 'Fire***Player', 'Ninja***22'];
-      const randomName = newNames[Math.floor(Math.random() * newNames.length)];
-      const randomUid = `${Math.floor(100 + Math.random() * 899)}****${Math.floor(10 + Math.random() * 89)}`;
-      const randomDiam = Math.random() > 0.4 ? '520 💎' : '1,060 💎';
+    // Random natural gap between 1 to 2 minutes (60s to 120s)
+    const randomInterval = Math.floor(60000 + Math.random() * 60000);
 
-      setRecentLog((prev) => [
-        {
-          id: `act-${Date.now()}`,
-          playerName: randomName,
-          uidMasked: randomUid,
-          diamonds: randomDiam,
-          timeAgo: 'Just now',
-        },
-        ...prev.slice(0, 4),
-      ]);
-    }, 12000);
+    timerRef.current = setTimeout(() => {
+      let nextIndex = Math.floor(Math.random() * FEED_SAMPLES.length);
+      if (nextIndex === sampleIndex) {
+        nextIndex = (sampleIndex + 1) % FEED_SAMPLES.length;
+      }
 
-    return () => clearInterval(interval);
-  }, []);
+      setSampleIndex(nextIndex);
+
+      const chosen = FEED_SAMPLES[nextIndex];
+      const newItem: ActivityFeedItem = {
+        id: `act-${Date.now()}-${Math.random()}`,
+        playerName: chosen.name,
+        uidMasked: chosen.uid,
+        diamonds: chosen.pkg,
+        timeAgo: 'Just now',
+      };
+
+      setRecentLog((prev) => [newItem, ...prev.slice(0, 3)]);
+    }, randomInterval);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [sampleIndex]);
 
   return (
     <section id="recent-activity" className="py-10 sm:py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,66 +71,21 @@ export const ActivitySection: React.FC = () => {
                 <span>Recent Activity</span>
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Overview of current community participation statistics and recent entries
+                Overview of recent community participation requests and activity stream
               </p>
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-bold">
-            <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-            <span>Sample Activity Metrics</span>
-          </div>
-        </div>
-
-        {/* Counter Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/80 rounded-2xl p-5 border border-blue-100 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20 shrink-0">
-              <Trophy className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="font-heading font-black text-2xl sm:text-3xl text-slate-900 tracking-tight">
-                {totalEntries.toLocaleString()}
-              </div>
-              <div className="text-xs font-bold text-blue-800 uppercase tracking-wider">
-                Total Submissions
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-indigo-50/80 to-violet-50/80 rounded-2xl p-5 border border-indigo-100 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-500/20 shrink-0">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="font-heading font-black text-2xl sm:text-3xl text-slate-900 tracking-tight">
-                {uniquePlayers.toLocaleString()}
-              </div>
-              <div className="text-xs font-bold text-indigo-800 uppercase tracking-wider">
-                Unique Players
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-cyan-50/80 to-teal-50/80 rounded-2xl p-5 border border-cyan-100 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-600 text-white flex items-center justify-center font-bold shadow-md shadow-cyan-500/20 shrink-0">
-              <Gem className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="font-heading font-black text-2xl sm:text-3xl text-slate-900 tracking-tight">
-                {diamondRequests.toLocaleString()} 💎
-              </div>
-              <div className="text-xs font-bold text-cyan-800 uppercase tracking-wider">
-                Diamonds Allocated
-              </div>
-            </div>
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold">
+            <Activity className="w-3.5 h-3.5 text-blue-600 animate-pulse shrink-0" />
+            <span>Live Activity Stream</span>
           </div>
         </div>
 
         {/* Live Submissions Feed */}
         <div className="space-y-3 pt-2">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
-            <span>Recent Participation Requests</span>
+            <span>Recent Activity Stream</span>
             <span className="flex items-center gap-1.5 text-emerald-600 text-[11px] lowercase">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               live stream
@@ -127,13 +93,14 @@ export const ActivitySection: React.FC = () => {
           </div>
 
           <div className="divide-y divide-slate-100 bg-slate-50/50 rounded-2xl border border-slate-200/80 overflow-hidden">
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {recentLog.map((act) => (
                 <motion.div
                   key={act.id}
-                  initial={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, y: -12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  exit={{ opacity: 0, y: 12 }}
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
                   className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-white transition-colors"
                 >
                   <div className="flex items-center gap-3">
@@ -165,12 +132,16 @@ export const ActivitySection: React.FC = () => {
           </div>
         </div>
 
-        {/* Disclaimer Note */}
-        <p className="text-[11px] text-slate-400 italic text-center">
-          Notice: Figures displayed represent sample activity metrics for layout demonstration purposes.
-        </p>
+        {/* Explicit Visual Animation Notice */}
+        <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-100">
+          <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <p className="text-[11px] text-slate-400 font-medium">
+            Notice: Figures displayed represent a visual activity animation for layout demonstration purposes.
+          </p>
+        </div>
 
       </div>
     </section>
   );
 };
+

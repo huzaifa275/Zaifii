@@ -1,0 +1,20 @@
+# ZAIFII Robots.txt
+# Search Engine Crawling Rules
+User-agent: *
+Allow: /
+Allow: /how-it-works
+Allow: /giveaway-rules
+Allow: /faq
+Allow: /learn-more
+Allow: /privacy-policy
+Allow: /terms
+Allow: /contact
+
+# Prevent indexing of technical or nonexistent internal paths
+Disallow: /admin
+Disallow: /api/
+Disallow: /_dev/
+Disallow: /*?*id=
+
+# Sitemap index location
+Sitemap: https://zaifii.com/sitemap.xml

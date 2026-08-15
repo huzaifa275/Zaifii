@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { ProgressIndicator } from './ProgressIndicator';
 import { Step1UID } from './Step1UID';
@@ -12,17 +12,28 @@ import { SITE_CONFIG } from '../../config/siteConfig';
 interface ParticipationContainerProps {
   onSubmitted: (entry: ParticipationEntry) => void;
   onError: (msg: string) => void;
+  resetKey?: number;
 }
 
 export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
   onSubmitted,
   onError,
+  resetKey = 0,
 }) => {
   const [step, setStep] = useState<number>(1);
   const [uid, setUid] = useState<string>('');
   const [playerName, setPlayerName] = useState<string>('');
   const [diamondAmount, setDiamondAmount] = useState<number | string>(520);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Reset all state back to Step 1 empty whenever resetKey updates
+  useEffect(() => {
+    setStep(1);
+    setUid('');
+    setPlayerName('');
+    setDiamondAmount(520);
+    setIsSubmitting(false);
+  }, [resetKey]);
 
   const handleNextUid = (enteredUid: string) => {
     setUid(enteredUid);
@@ -57,6 +68,12 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
     setTimeout(() => {
       setIsSubmitting(false);
       onSubmitted(newEntry);
+      
+      // Immediately reset background form state so any future participation starts 100% fresh
+      setStep(1);
+      setUid('');
+      setPlayerName('');
+      setDiamondAmount(520);
     }, 800);
   };
 
@@ -83,7 +100,7 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <Step1UID
-                  key="step1"
+                  key={`step1-${resetKey}`}
                   initialUid={uid}
                   onNext={handleNextUid}
                   onError={onError}
@@ -92,7 +109,7 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
 
               {step === 2 && (
                 <Step2Name
-                  key="step2"
+                  key={`step2-${resetKey}`}
                   initialName={playerName}
                   onNext={handleNextName}
                   onBack={() => setStep(1)}
@@ -102,7 +119,7 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
 
               {step === 3 && (
                 <Step3Diamonds
-                  key="step3"
+                  key={`step3-${resetKey}`}
                   initialDiamonds={diamondAmount}
                   onNext={handleNextDiamonds}
                   onBack={() => setStep(2)}
@@ -112,7 +129,7 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
 
               {step === 4 && (
                 <Step4Review
-                  key="step4"
+                  key={`step4-${resetKey}`}
                   uid={uid}
                   playerName={playerName}
                   diamondAmount={diamondAmount}

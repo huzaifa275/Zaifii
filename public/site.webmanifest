@@ -1,0 +1,27 @@
+{
+  "name": "ZAIFII — Free Fire Giveaway & Diamond Giveaway",
+  "short_name": "ZAIFII",
+  "description": "Participate in the ZAIFII Free Fire giveaway, submit your eligible entry, and learn how additional entries can increase your chances of winning.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7FAFF",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

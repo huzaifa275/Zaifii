@@ -103,10 +103,10 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           <div className="mt-4 p-4 rounded-2xl bg-blue-50/80 border border-blue-200/80 text-xs text-blue-900 space-y-2">
             <div className="flex items-center gap-2 font-bold text-blue-950">
               <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>Want Another Entry?</span>
+              <span>Ready for another eligible entry?</span>
             </div>
-            <p className="leading-relaxed">
-              You can participate again by completing the process again. Each eligible participation counts as an additional entry.
+            <p className="leading-relaxed text-slate-600">
+              You can participate again by manually completing the process again. Each participation is treated as a new, independently completed entry.
             </p>
             <button
               onClick={() => {
@@ -131,10 +131,10 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
                 onClose();
                 onNewEntry();
               }}
-              className="flex-1 py-3.5 px-5 font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 py-3.5 px-5 font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer group"
             >
-              <RefreshCw className="w-4 h-4" />
-              <span>Submit Another Entry</span>
+              <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+              <span>Participate Again →</span>
             </button>
 
             <button

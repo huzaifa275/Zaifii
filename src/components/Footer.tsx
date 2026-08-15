@@ -5,6 +5,7 @@ import { AdSlot } from './AdSlot';
 
 interface FooterProps {
   onNavigate: (sectionId: string) => void;
+  onNavigatePath: (path: string) => void;
   onOpenLearnMore: () => void;
   onOpenRules: () => void;
   onStartParticipation: () => void;
@@ -12,6 +13,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({
   onNavigate,
+  onNavigatePath,
   onOpenLearnMore,
   onOpenRules,
   onStartParticipation,
@@ -30,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Brand Info */}
           <div className="space-y-3 md:col-span-1">
             <div 
-              onClick={() => onNavigate('hero')}
+              onClick={() => onNavigatePath('/')}
               className="flex items-center gap-2 cursor-pointer group"
             >
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 p-0.5 shadow-md shadow-blue-500/20">
@@ -60,7 +62,7 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-2 text-xs font-semibold">
               <li>
-                <button onClick={() => onNavigate('hero')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigatePath('/')} className="hover:text-blue-400 transition-colors">
                   Home
                 </button>
               </li>
@@ -70,23 +72,23 @@ export const Footer: React.FC<FooterProps> = ({
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('how-it-works')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigatePath('/how-it-works')} className="hover:text-blue-400 transition-colors">
                   How It Works
                 </button>
               </li>
               <li>
-                <button onClick={onOpenRules} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigatePath('/giveaway-rules')} className="hover:text-blue-400 transition-colors">
                   Giveaway Rules
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('faq')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigatePath('/faq')} className="hover:text-blue-400 transition-colors">
                   FAQ
                 </button>
               </li>
               <li>
-                <button onClick={onOpenLearnMore} className="hover:text-blue-400 transition-colors">
-                  Learn Extra Entries
+                <button onClick={() => onNavigatePath('/learn-more')} className="hover:text-blue-400 transition-colors">
+                  Learn How Additional Entries Work
                 </button>
               </li>
             </ul>
@@ -99,24 +101,24 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-2 text-xs font-semibold text-slate-400">
               <li>
-                <span className="hover:text-white transition-colors cursor-pointer" title="Placeholder: PRIVACY_POLICY_URL_HERE">
-                  Privacy Policy
-                </span>
+                <button onClick={() => onNavigatePath('/privacy-policy')} className="hover:text-white transition-colors text-left">
+                  Read Privacy Policy
+                </button>
               </li>
               <li>
-                <span className="hover:text-white transition-colors cursor-pointer" title="Placeholder: TERMS_URL_HERE">
+                <button onClick={() => onNavigatePath('/terms')} className="hover:text-white transition-colors text-left">
                   Terms & Conditions
-                </span>
+                </button>
               </li>
               <li>
-                <span className="hover:text-white transition-colors cursor-pointer" title="Placeholder: CONTACT_URL_HERE">
-                  Contact Support
-                </span>
+                <button onClick={() => onNavigatePath('/contact')} className="hover:text-white transition-colors text-left">
+                  Contact ZAIFII Support
+                </button>
               </li>
               <li>
-                <span className="hover:text-white transition-colors cursor-pointer" title="Placeholder: TIKTOK_URL_HERE">
-                  Official TikTok Link
-                </span>
+                <button onClick={() => onNavigatePath('/learn-more')} className="hover:text-white transition-colors text-left">
+                  Official TikTok Entry Instructions
+                </button>
               </li>
             </ul>
           </div>

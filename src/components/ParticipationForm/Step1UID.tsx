@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { UserCheck, HelpCircle, ArrowRight, ShieldCheck } from 'lucide-react';
 
@@ -15,6 +15,18 @@ export const Step1UID: React.FC<Step1UIDProps> = ({
 }) => {
   const [uid, setUid] = useState(initialUid);
   const [inputError, setInputError] = useState('');
+
+  useEffect(() => {
+    setUid(initialUid);
+    setInputError('');
+    const timer = setTimeout(() => {
+      const el = document.getElementById('ff-uid-input');
+      if (el) {
+        el.focus();
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [initialUid]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -6,6 +6,7 @@ import { AdSlot } from './AdSlot';
 
 interface HeaderProps {
   onNavigate: (sectionId: string) => void;
+  onNavigatePath: (path: string) => void;
   onOpenLearnMore: () => void;
   onOpenRules: () => void;
   onStartParticipation: () => void;
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   onNavigate,
+  onNavigatePath,
   onOpenLearnMore,
   onOpenRules,
   onStartParticipation,
@@ -23,9 +25,9 @@ export const Header: React.FC<HeaderProps> = ({
   // INSERT ADSTERRA CODE HERE
   // INSERT MONETAG CODE HERE
 
-  const handleNavClick = (sectionId: string) => {
+  const handleNavPath = (path: string) => {
     setMobileMenuOpen(false);
-    onNavigate(sectionId);
+    onNavigatePath(path);
   };
 
   return (
@@ -42,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
           
           {/* ZAIFII Logo / Wordmark */}
           <div 
-            onClick={() => handleNavClick('hero')}
+            onClick={() => handleNavPath('/')}
             className="flex items-center gap-2.5 cursor-pointer group select-none"
           >
             <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-violet-600 p-0.5 shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
@@ -63,31 +65,31 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1 lg:gap-2">
             <button
-              onClick={() => handleNavClick('hero')}
+              onClick={() => handleNavPath('/')}
               className="px-3.5 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
             >
               Home
             </button>
             <button
-              onClick={() => handleNavClick('how-it-works')}
+              onClick={() => handleNavPath('/how-it-works')}
               className="px-3.5 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
             >
               How It Works
             </button>
             <button
-              onClick={onOpenRules}
+              onClick={() => handleNavPath('/giveaway-rules')}
               className="px-3.5 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
             >
               Giveaway Rules
             </button>
             <button
-              onClick={() => handleNavClick('faq')}
+              onClick={() => handleNavPath('/faq')}
               className="px-3.5 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
             >
               FAQ
             </button>
             <button
-              onClick={onOpenLearnMore}
+              onClick={() => handleNavPath('/learn-more')}
               className="px-3.5 py-2 text-sm font-semibold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-slate-50 transition-colors"
             >
               Learn More
@@ -138,40 +140,34 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="px-4 pt-3 pb-6 space-y-1">
               <button
-                onClick={() => handleNavClick('hero')}
+                onClick={() => handleNavPath('/')}
                 className="w-full text-left px-4 py-3 text-base font-semibold text-slate-800 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors flex items-center justify-between"
               >
                 <span>Home</span>
               </button>
               <button
-                onClick={() => handleNavClick('how-it-works')}
+                onClick={() => handleNavPath('/how-it-works')}
                 className="w-full text-left px-4 py-3 text-base font-semibold text-slate-800 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors flex items-center justify-between"
               >
                 <span>How It Works</span>
               </button>
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenRules();
-                }}
+                onClick={() => handleNavPath('/giveaway-rules')}
                 className="w-full text-left px-4 py-3 text-base font-semibold text-slate-800 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors flex items-center justify-between"
               >
                 <span>Giveaway Rules</span>
               </button>
               <button
-                onClick={() => handleNavClick('faq')}
+                onClick={() => handleNavPath('/faq')}
                 className="w-full text-left px-4 py-3 text-base font-semibold text-slate-800 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors flex items-center justify-between"
               >
                 <span>FAQ</span>
               </button>
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenLearnMore();
-                }}
+                onClick={() => handleNavPath('/learn-more')}
                 className="w-full text-left px-4 py-3 text-base font-semibold text-slate-800 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors flex items-center justify-between"
               >
-                <span>Learn More (Extra Entries)</span>
+                <span>Learn How Additional Entries Work</span>
               </button>
 
               <div className="pt-3">
