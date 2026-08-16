@@ -3,30 +3,30 @@ import { motion } from 'motion/react';
 import { UserCheck, HelpCircle, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface Step1UIDProps {
-  initialUid: string;
-  onNext: (uid: string) => void;
+  uid: string;
+  onChangeUid: (uid: string) => void;
+  onNext: () => void;
   onError: (msg: string) => void;
 }
 
 export const Step1UID: React.FC<Step1UIDProps> = ({
-  initialUid,
+  uid,
+  onChangeUid,
   onNext,
   onError,
 }) => {
-  const [uid, setUid] = useState(initialUid);
   const [inputError, setInputError] = useState('');
 
   useEffect(() => {
-    setUid(initialUid);
     setInputError('');
     const timer = setTimeout(() => {
       const el = document.getElementById('ff-uid-input');
-      if (el) {
+      if (el && document.activeElement !== el) {
         el.focus();
       }
     }, 150);
     return () => clearTimeout(timer);
-  }, [initialUid]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +47,7 @@ export const Step1UID: React.FC<Step1UIDProps> = ({
     }
 
     setInputError('');
-    onNext(cleaned);
+    onNext();
   };
 
   return (
@@ -82,7 +82,7 @@ export const Step1UID: React.FC<Step1UIDProps> = ({
             inputMode="numeric"
             value={uid}
             onChange={(e) => {
-              setUid(e.target.value);
+              onChangeUid(e.target.value);
               if (inputError) setInputError('');
             }}
             placeholder="e.g. 1234567890"
@@ -122,3 +122,4 @@ export const Step1UID: React.FC<Step1UIDProps> = ({
     </motion.form>
   );
 };
+

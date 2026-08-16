@@ -15,39 +15,85 @@ interface ParticipationContainerProps {
   resetKey?: number;
 }
 
+const SESSION_STORAGE_KEY = 'zaifii_active_participation_form_state';
+
+interface PersistentFormState {
+  uid: string;
+  playerName: string;
+  diamondAmount: number | string;
+  step: number;
+}
+
+const getInitialFormState = (): PersistentFormState => {
+  try {
+    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return {
+          uid: typeof parsed.uid === 'string' ? parsed.uid : '',
+          playerName: typeof parsed.playerName === 'string' ? parsed.playerName : '',
+          diamondAmount: parsed.diamondAmount ?? 520,
+          step: typeof parsed.step === 'number' && parsed.step >= 1 && parsed.step <= 4 ? parsed.step : 1,
+        };
+      }
+    }
+  } catch {
+    // Ignore error if storage is unavailable
+  }
+  return { uid: '', playerName: '', diamondAmount: 520, step: 1 };
+};
+
 export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
   onSubmitted,
   onError,
   resetKey = 0,
 }) => {
-  const [step, setStep] = useState<number>(1);
-  const [uid, setUid] = useState<string>('');
-  const [playerName, setPlayerName] = useState<string>('');
-  const [diamondAmount, setDiamondAmount] = useState<number | string>(520);
+  const [formState, setFormState] = useState<PersistentFormState>(getInitialFormState);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Reset all state back to Step 1 empty whenever resetKey updates
+  // Sync state changes to sessionStorage immediately
+  const updateFormState = (updates: Partial<PersistentFormState>) => {
+    setFormState((prev) => {
+      const next = { ...prev, ...updates };
+      try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore storage write error
+      }
+      return next;
+    });
+  };
+
+  // Reset all state back to Step 1 empty whenever resetKey updates (intentional reset)
   useEffect(() => {
-    setStep(1);
-    setUid('');
-    setPlayerName('');
-    setDiamondAmount(520);
-    setIsSubmitting(false);
+    if (resetKey > 0) {
+      const freshState: PersistentFormState = {
+        uid: '',
+        playerName: '',
+        diamondAmount: 520,
+        step: 1,
+      };
+      setFormState(freshState);
+      setIsSubmitting(false);
+      try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(freshState));
+      } catch {
+        // Ignore error
+      }
+    }
   }, [resetKey]);
 
-  const handleNextUid = (enteredUid: string) => {
-    setUid(enteredUid);
-    setStep(2);
+  const handleNextUid = () => {
+    updateFormState({ step: 2 });
   };
 
-  const handleNextName = (enteredName: string) => {
-    setPlayerName(enteredName);
-    setStep(3);
+  const handleNextName = () => {
+    updateFormState({ step: 3 });
   };
 
-  const handleNextDiamonds = (amount: number | string) => {
-    setDiamondAmount(amount);
-    setStep(4);
+  const handleNextDiamonds = () => {
+    updateFormState({ step: 4 });
   };
 
   const handleSubmit = () => {
@@ -57,9 +103,9 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
     const randomHex = Math.floor(100000 + Math.random() * 900000);
     const newEntry: ParticipationEntry = {
       requestId: `ZF-${randomHex}`,
-      uid,
-      playerName,
-      diamondAmount,
+      uid: formState.uid,
+      playerName: formState.playerName,
+      diamondAmount: formState.diamondAmount,
       timestamp: new Date().toISOString(),
       status: 'Eligible Entry Submitted',
       source: 'ZAIFII Direct Portal',
@@ -68,12 +114,6 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
     setTimeout(() => {
       setIsSubmitting(false);
       onSubmitted(newEntry);
-      
-      // Immediately reset background form state so any future participation starts 100% fresh
-      setStep(1);
-      setUid('');
-      setPlayerName('');
-      setDiamondAmount(520);
     }, 800);
   };
 
@@ -89,51 +129,56 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
 
           {/* Progress Bar Header */}
           <ProgressIndicator
-            currentStep={step}
+            currentStep={formState.step}
             onStepClick={(targetStep) => {
-              if (targetStep < step) setStep(targetStep);
+              if (targetStep <= formState.step || targetStep === 1 || targetStep === 2 || targetStep === 3) {
+                updateFormState({ step: targetStep });
+              }
             }}
           />
 
           {/* Form Step Switcher */}
           <div className="mt-4">
             <AnimatePresence mode="wait">
-              {step === 1 && (
+              {formState.step === 1 && (
                 <Step1UID
-                  key={`step1-${resetKey}`}
-                  initialUid={uid}
+                  key="step1"
+                  uid={formState.uid}
+                  onChangeUid={(newUid) => updateFormState({ uid: newUid })}
                   onNext={handleNextUid}
                   onError={onError}
                 />
               )}
 
-              {step === 2 && (
+              {formState.step === 2 && (
                 <Step2Name
-                  key={`step2-${resetKey}`}
-                  initialName={playerName}
+                  key="step2"
+                  playerName={formState.playerName}
+                  onChangeName={(newName) => updateFormState({ playerName: newName })}
                   onNext={handleNextName}
-                  onBack={() => setStep(1)}
+                  onBack={() => updateFormState({ step: 1 })}
                   onError={onError}
                 />
               )}
 
-              {step === 3 && (
+              {formState.step === 3 && (
                 <Step3Diamonds
-                  key={`step3-${resetKey}`}
-                  initialDiamonds={diamondAmount}
+                  key="step3"
+                  diamondAmount={formState.diamondAmount}
+                  onChangeDiamonds={(newAmount) => updateFormState({ diamondAmount: newAmount })}
                   onNext={handleNextDiamonds}
-                  onBack={() => setStep(2)}
+                  onBack={() => updateFormState({ step: 2 })}
                   onError={onError}
                 />
               )}
 
-              {step === 4 && (
+              {formState.step === 4 && (
                 <Step4Review
-                  key={`step4-${resetKey}`}
-                  uid={uid}
-                  playerName={playerName}
-                  diamondAmount={diamondAmount}
-                  onEdit={() => setStep(1)}
+                  key="step4"
+                  uid={formState.uid}
+                  playerName={formState.playerName}
+                  diamondAmount={formState.diamondAmount}
+                  onEdit={() => updateFormState({ step: 1 })}
                   onSubmit={handleSubmit}
                   isSubmitting={isSubmitting}
                 />
@@ -150,3 +195,4 @@ export const ParticipationContainer: React.FC<ParticipationContainerProps> = ({
     </section>
   );
 };
+

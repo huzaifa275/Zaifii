@@ -3,32 +3,32 @@ import { motion } from 'motion/react';
 import { Gamepad2, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface Step2NameProps {
-  initialName: string;
-  onNext: (name: string) => void;
+  playerName: string;
+  onChangeName: (name: string) => void;
+  onNext: () => void;
   onBack: () => void;
   onError: (msg: string) => void;
 }
 
 export const Step2Name: React.FC<Step2NameProps> = ({
-  initialName,
+  playerName,
+  onChangeName,
   onNext,
   onBack,
   onError,
 }) => {
-  const [playerName, setPlayerName] = useState(initialName);
   const [inputError, setInputError] = useState('');
 
   useEffect(() => {
-    setPlayerName(initialName);
     setInputError('');
     const timer = setTimeout(() => {
       const el = document.getElementById('ff-name-input');
-      if (el) {
+      if (el && document.activeElement !== el) {
         el.focus();
       }
     }, 150);
     return () => clearTimeout(timer);
-  }, [initialName]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +49,7 @@ export const Step2Name: React.FC<Step2NameProps> = ({
     }
 
     setInputError('');
-    onNext(cleaned);
+    onNext();
   };
 
   return (
@@ -82,7 +82,7 @@ export const Step2Name: React.FC<Step2NameProps> = ({
           type="text"
           value={playerName}
           onChange={(e) => {
-            setPlayerName(e.target.value);
+            onChangeName(e.target.value);
             if (inputError) setInputError('');
           }}
           placeholder="Enter your in-game name"
@@ -124,3 +124,4 @@ export const Step2Name: React.FC<Step2NameProps> = ({
     </motion.form>
   );
 };
+

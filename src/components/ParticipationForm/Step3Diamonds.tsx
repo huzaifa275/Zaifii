@@ -1,37 +1,48 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { Gem, ArrowRight, ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { Gem, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { SITE_CONFIG } from '../../config/siteConfig';
 
 interface Step3DiamondsProps {
-  initialDiamonds: number | string;
-  onNext: (diamonds: number | string) => void;
+  diamondAmount: number | string;
+  onChangeDiamonds: (amount: number | string) => void;
+  onNext: () => void;
   onBack: () => void;
   onError: (msg: string) => void;
 }
 
 export const Step3Diamonds: React.FC<Step3DiamondsProps> = ({
-  initialDiamonds,
+  diamondAmount,
+  onChangeDiamonds,
   onNext,
   onBack,
   onError,
 }) => {
-  const [selectedId, setSelectedId] = useState<string>(() => {
-    if (!initialDiamonds) return 'd520';
-    if (typeof initialDiamonds === 'number') {
-      const match = SITE_CONFIG.diamondOptions.find((d) => d.amount === initialDiamonds);
-      return match ? match.id : 'dCustom';
-    }
-    return 'dCustom';
-  });
+  const isCustom =
+    typeof diamondAmount === 'string'
+      ? diamondAmount === 'Custom' || !SITE_CONFIG.diamondOptions.some((d) => String(d.amount) === diamondAmount)
+      : typeof diamondAmount === 'number' && !SITE_CONFIG.diamondOptions.some((d) => d.amount === diamondAmount);
 
-  const [customVal, setCustomVal] = useState<string>(() => {
-    if (typeof initialDiamonds === 'string' && initialDiamonds !== 'Custom') return initialDiamonds;
-    if (typeof initialDiamonds === 'number' && !SITE_CONFIG.diamondOptions.some((d) => d.amount === initialDiamonds)) {
-      return String(initialDiamonds);
+  const selectedId = isCustom
+    ? 'dCustom'
+    : SITE_CONFIG.diamondOptions.find((d) => d.amount === diamondAmount)?.id || 'd520';
+
+  const customVal = isCustom
+    ? typeof diamondAmount === 'number'
+      ? String(diamondAmount)
+      : diamondAmount === 'Custom'
+      ? ''
+      : String(diamondAmount)
+    : '';
+
+  const handleCardClick = (id: string, amount: number | string) => {
+    if (id === 'dCustom') {
+      const parsed = customVal ? parseInt(customVal, 10) : NaN;
+      onChangeDiamonds(!isNaN(parsed) && parsed > 0 ? parsed : 'Custom');
+    } else {
+      onChangeDiamonds(amount);
     }
-    return '';
-  });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,11 +53,13 @@ export const Step3Diamonds: React.FC<Step3DiamondsProps> = ({
         onError('Please enter a valid custom diamond amount.');
         return;
       }
-      onNext(num);
+      onChangeDiamonds(num);
+      onNext();
     } else {
       const pkg = SITE_CONFIG.diamondOptions.find((d) => d.id === selectedId);
       if (pkg && pkg.amount !== 'Custom') {
-        onNext(pkg.amount);
+        onChangeDiamonds(pkg.amount);
+        onNext();
       } else {
         onError('Please select a valid diamond package.');
       }
@@ -80,7 +93,7 @@ export const Step3Diamonds: React.FC<Step3DiamondsProps> = ({
           return (
             <div
               key={item.id}
-              onClick={() => setSelectedId(item.id)}
+              onClick={() => handleCardClick(item.id, item.amount)}
               className={`relative cursor-pointer rounded-2xl p-4 border transition-all text-center flex flex-col items-center justify-between select-none ${
                 isSelected
                   ? 'bg-gradient-to-b from-blue-50/90 to-cyan-50/90 border-blue-500 ring-2 ring-blue-500/30 shadow-lg shadow-blue-500/10 scale-[1.02]'
@@ -132,7 +145,15 @@ export const Step3Diamonds: React.FC<Step3DiamondsProps> = ({
               min="10"
               max="50000"
               value={customVal}
-              onChange={(e) => setCustomVal(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val) {
+                  onChangeDiamonds('Custom');
+                } else {
+                  const num = parseInt(val, 10);
+                  onChangeDiamonds(isNaN(num) ? val : num);
+                }
+              }}
               placeholder="e.g. 500"
               className="w-full px-4 py-3 text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl text-base font-semibold focus-ring"
               autoFocus
@@ -166,3 +187,4 @@ export const Step3Diamonds: React.FC<Step3DiamondsProps> = ({
     </motion.form>
   );
 };
+
